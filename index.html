@@ -88,7 +88,9 @@
 
             <div class="btn-group">
                 <button type="button" class="btn btn-primary" onclick="printForm()">Imprimir</button>
-                <button type="button" class="btn btn-success" onclick="generatePDF()">Generar PDF</button>
+                    <button type="button" class="btn btn-success" onclick="generatePDF()">Generar PDF</button>
+                    <button type="button" class="btn btn-danger" onclick="clearForm()">Limpiar Formulario PDF</button>
+
             </div>
         </form>
     </div>
@@ -231,6 +233,25 @@ function loadForm() {
             window.print();
             saveForm();
         }
+
+
+        function clearForm() {
+    if (confirm("¿Estás seguro de que deseas limpiar y reiniciar el formulario?")) {
+        // Limpiar datos del almacenamiento local
+        localStorage.removeItem("technicalForm");
+
+        // Reiniciar el formulario
+        document.getElementById("technicalForm").reset();
+
+        // Limpiar el contenedor de equipos evaluados
+        document.getElementById("equipmentContainer").innerHTML = "";
+
+        // Configurar la fecha con la actual
+        document.getElementById("date").valueAsDate = new Date();
+
+        alert("Formulario limpiado y reiniciado.");
+    }
+}
     </script>
 </body>
 
