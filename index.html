@@ -51,7 +51,7 @@
 <body>
     <div class="container">
         <h1 class="mb-4">Informe Técnico</h1>
-        <h4> Marco Ortega Montoya / Serivicio reparacion Electrodomésticos / +506 7012 7114</h4>
+        <h4> Marco Ortega Montoya / Servicio reparación Electrodomésticos / +506 7012 7114</h4>
         <form id="technicalForm">
             <div class="form-section">
                 <h5>Datos Generales</h5>
@@ -139,7 +139,7 @@
 
             doc.setFontSize(16);
             doc.text("Informe Técnico", 10, 10);
-            doc.text("Marco Ortega Montoya / Serivicio reparacion Electrodomésticos", 10, 15);
+            doc.text("Marco Ortega Montoya / Servicio reparación Electrodomésticos", 10, 15);
            
 
             doc.setFontSize(14);
@@ -181,7 +181,27 @@
         }
 
         function loadForm() {
-            // Cargar datos desde localStorage
+            const savedData = localStorage.getItem("technicalForm");
+            if (savedData) {
+                const formData = JSON.parse(savedData);
+                Object.entries(formData).forEach(([key, value]) => {
+                    const input = document.getElementById(key);
+                    if (input && key !== "equipmentData") input.value = value;
+                });
+
+                // Cargar equipos evaluados
+                if (formData.equipmentData) {
+                    document.getElementById("equipmentContainer").innerHTML = ""; // Limpia contenedor
+                    formData.equipmentData.forEach((equipment) => {
+                        addEquipment();
+                        const item = document.querySelectorAll(".equipment-item:last-child")[0];
+                        item.querySelector("input[placeholder='Datos del equipo']").value = equipment.equipo;
+                        item.querySelector("textarea[placeholder='Problema detectado']").value = equipment.problema;
+                        item.querySelector("textarea[placeholder='Acciones realizadas']").value = equipment.acciones;
+                        item.querySelector("textarea[placeholder='Observaciones']").value = equipment.observaciones;
+                    });
+                }
+            }
         }
 
         function printForm() {
