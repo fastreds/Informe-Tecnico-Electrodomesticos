@@ -100,32 +100,35 @@
         });
 
         function addEquipment() {
-            const equipmentContainer = document.getElementById("equipmentContainer");
-            const equipmentIndex = document.querySelectorAll(".equipment-item").length;
+    const equipmentContainer = document.getElementById("equipmentContainer");
+    const equipmentIndex = document.querySelectorAll(".equipment-item").length;
 
-            const equipmentHTML = `
-                <div class="equipment-item mb-2">
-                    <h6>Equipo ${equipmentIndex + 1}</h6>
-                    <div class="mb-2">
-                        <label class="form-label">Datos del equipo</label>
-                        <input class="form-control" placeholder="Datos del equipo">
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Problema Detectado</label>
-                        <textarea class="form-control" rows="2" placeholder="Problema detectado"></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Acciones Realizadas</label>
-                        <textarea class="form-control" rows="2" placeholder="Acciones realizadas"></textarea>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label">Observaciones</label>
-                        <textarea class="form-control" rows="2" placeholder="Observaciones"></textarea>
-                    </div>
-                </div>
-            `;
-            equipmentContainer.insertAdjacentHTML("beforeend", equipmentHTML);
-        }
+    const equipmentHTML = `
+        <div class="equipment-item mb-2">
+            <h6>Equipo ${equipmentIndex + 1}</h6>
+            <div class="mb-2">
+                <label class="form-label">Datos del equipo</label>
+                <input class="form-control" placeholder="Datos del equipo">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Problema Detectado</label>
+                <textarea class="form-control" rows="2" placeholder="Problema detectado"></textarea>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Acciones Realizadas</label>
+                <textarea class="form-control" rows="2" placeholder="Acciones realizadas"></textarea>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Observaciones</label>
+                <textarea class="form-control" rows="2" placeholder="Observaciones"></textarea>
+            </div>
+        </div>
+    `;
+    equipmentContainer.insertAdjacentHTML("beforeend", equipmentHTML); 
+       saveForm() ;
+}
+        
+   
 
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
@@ -178,34 +181,55 @@
             );
 
             doc.save(`Informe_Tecnico_${clientName}.pdf`);
+            saveForm();
         }
 
-        function loadForm() {
-            const savedData = localStorage.getItem("technicalForm");
-            if (savedData) {
-                const formData = JSON.parse(savedData);
-                Object.entries(formData).forEach(([key, value]) => {
-                    const input = document.getElementById(key);
-                    if (input && key !== "equipmentData") input.value = value;
-                });
 
-                // Cargar equipos evaluados
-                if (formData.equipmentData) {
-                    document.getElementById("equipmentContainer").innerHTML = ""; // Limpia contenedor
-                    formData.equipmentData.forEach((equipment) => {
-                        addEquipment();
-                        const item = document.querySelectorAll(".equipment-item:last-child")[0];
-                        item.querySelector("input[placeholder='Datos del equipo']").value = equipment.equipo;
-                        item.querySelector("textarea[placeholder='Problema detectado']").value = equipment.problema;
-                        item.querySelector("textarea[placeholder='Acciones realizadas']").value = equipment.acciones;
-                        item.querySelector("textarea[placeholder='Observaciones']").value = equipment.observaciones;
-                    });
-                }
-            }
+
+        function saveForm() {
+    const formData = {
+        date: document.getElementById("date").value,
+        clientName: document.getElementById("clientName").value,
+        address: document.getElementById("address").value,
+        phone: document.getElementById("phone").value,
+        equipmentData: Array.from(document.querySelectorAll(".equipment-item")).map((item) => ({
+            equipo: item.querySelector("input[placeholder='Datos del equipo']").value,
+            problema: item.querySelector("textarea[placeholder='Problema detectado']").value,
+            acciones: item.querySelector("textarea[placeholder='Acciones realizadas']").value,
+            observaciones: item.querySelector("textarea[placeholder='Observaciones']").value,
+        })),
+    };
+
+    localStorage.setItem("technicalForm", JSON.stringify(formData));
+}
+
+function loadForm() {
+    const savedData = JSON.parse(localStorage.getItem("technicalForm"));
+    if (savedData) {
+        document.getElementById("date").value = savedData.date || "";
+        document.getElementById("clientName").value = savedData.clientName || "";
+        document.getElementById("address").value = savedData.address || "";
+        document.getElementById("phone").value = savedData.phone || "";
+
+        // Cargar equipos evaluados
+        const equipmentContainer = document.getElementById("equipmentContainer");
+        equipmentContainer.innerHTML = ""; // Limpia el contenedor
+        if (savedData.equipmentData) {
+            savedData.equipmentData.forEach((equipment) => {
+                addEquipment();
+                const lastEquipmentItem = equipmentContainer.querySelector(".equipment-item:last-child");
+                lastEquipmentItem.querySelector("input[placeholder='Datos del equipo']").value = equipment.equipo;
+                lastEquipmentItem.querySelector("textarea[placeholder='Problema detectado']").value = equipment.problema;
+                lastEquipmentItem.querySelector("textarea[placeholder='Acciones realizadas']").value = equipment.acciones;
+                lastEquipmentItem.querySelector("textarea[placeholder='Observaciones']").value = equipment.observaciones;
+            });
         }
+    }
+}
 
         function printForm() {
             window.print();
+            saveForm();
         }
     </script>
 </body>
